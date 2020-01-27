@@ -1,6 +1,7 @@
 module PropCalc where
 
 import Data.List
+import Control.Applicative
 
 data Exp
     = Prop Char        
@@ -14,7 +15,15 @@ eval :: [Exp] -> Exp -> Maybe Bool
 eval given try
     |elem try given = Just True
     |elem (Not try) given = Just False
-    |otherwise = Nothing
+    |otherwise = eval' given try
+
+eval' :: [Exp] -> Exp -> Maybe Bool
+eval' _ (Prop p) = Nothing
+eval' given (And p q) = liftA2 (&&) (eval given p) (eval given q)
+eval' given (Or p q) = liftA2 (||) (eval given p) (eval given q)
+eval' given (Implies p q) = liftA2 (||) (eval given (Not p)) (eval given q)
+eval' given (Not p) = fmap not (eval given p)
+
 
 atoms' :: Exp -> [Char]
 atoms' (Prop c) = [c]
