@@ -12,3 +12,9 @@ eval :: [Exp] -> Exp -> Maybe Bool
 eval given try
     |elem try given = Just True
     |elem (Not try) given = Just False
+    |otherwise = Nothing
+
+atoms :: Exp -> [Char]
+atoms (Prop c) = [c]
+atoms _ x y  = (atoms x) ++ (atoms y)
+atoms Not Exp = atoms Exp
