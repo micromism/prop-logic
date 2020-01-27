@@ -1,10 +1,12 @@
 module PropCalc where
 
+import Data.List
+
 data Exp
-    | Prop Char        
-    | And Exp Exp  
-    | Or Exp Exp 
-    | Implies Exp Exp   
+    = Prop Char        
+    | And Exp Exp
+    | Or Exp Exp
+    | Implies Exp Exp
     | Not Exp
     deriving (Show, Eq)
 
@@ -14,7 +16,12 @@ eval given try
     |elem (Not try) given = Just False
     |otherwise = Nothing
 
+atoms' :: Exp -> [Char]
+atoms' (Prop c) = [c]
+atoms' (And x y)  = (atoms' x) ++ (atoms' y)
+atoms' (Or x y)  = (atoms' x) ++ (atoms' y)
+atoms' (Implies x y)  = (atoms' x) ++ (atoms' y)
+atoms' (Not x) = atoms' x
+
 atoms :: Exp -> [Char]
-atoms (Prop c) = [c]
-atoms _ x y  = (atoms x) ++ (atoms y)
-atoms Not Exp = atoms Exp
+atoms = nub . atoms'
