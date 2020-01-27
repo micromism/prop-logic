@@ -24,6 +24,16 @@ eval' given (Or p q) = liftA2 (||) (eval given p) (eval given q)
 eval' given (Implies p q) = liftA2 (||) (eval given (Not p)) (eval given q)
 eval' given (Not p) = fmap not (eval given p)
 
+taut :: Exp -> Bool
+taut sent = unMaybe (foldr (liftA2 (&&)) (Just True) (map (\entry -> eval entry sent) (truthTable (atoms sent))))
+
+unMaybe :: Maybe Bool -> Bool
+unMaybe (Just True) =  True
+unMaybe (Just False) = False
+unMaybe Nothing = False
+
+truthTable :: [Char] -> [[Exp]]
+truthTable = foldr (\x y -> (map ((Prop x):) y) ++ (map ((Not (Prop x)):) y)) [[]]
 
 atoms' :: Exp -> [Char]
 atoms' (Prop c) = [c]
