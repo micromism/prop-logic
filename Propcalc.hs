@@ -27,14 +27,6 @@ evalOnTT' given (Not p) = fmap not (evalOnTT given p)
 taut :: Exp -> Bool
 taut sent = truthy (foldr (liftA2 (&&)) (Just True) (map (\entry -> evalOnTT entry sent) (truthTable (atoms sent))))
 
-provableGiven :: [Exp] -> Exp -> Bool
-provableGiven axioms sent = taut (Implies (conjunct axioms) sent)
-
-conjunct :: [Exp] -> Exp
-conjunct [e] = e
-conjunct (e:es) = And e (conjunct es)
-conjunct [] = undefined
-
 truthy :: Maybe Bool -> Bool
 truthy (Just True) =  True
 truthy (Just False) = False
@@ -52,3 +44,11 @@ atoms' (Not x) = atoms' x
 
 atoms :: Exp -> [Char]
 atoms = nub . atoms'
+
+provableGiven :: [Exp] -> Exp -> Bool
+provableGiven axioms sent = taut (Implies (conjunct axioms) sent)
+
+conjunct :: [Exp] -> Exp
+conjunct [e] = e
+conjunct (e:es) = And e (conjunct es)
+conjunct [] = undefined
