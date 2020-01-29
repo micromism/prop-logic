@@ -11,26 +11,34 @@ data Exp
     | Not Exp
     deriving (Show, Eq)
 
-eval :: [Exp] -> Exp -> Maybe Bool
-eval given try
+evalOnTT :: [Exp] -> Exp -> Maybe Bool
+evalOnTT given try
     |elem try given = Just True
     |elem (Not try) given = Just False
-    |otherwise = eval' given try
+    |otherwise = evalOnTT' given try
 
-eval' :: [Exp] -> Exp -> Maybe Bool
-eval' _ (Prop p) = Nothing
-eval' given (And p q) = liftA2 (&&) (eval given p) (eval given q)
-eval' given (Or p q) = liftA2 (||) (eval given p) (eval given q)
-eval' given (Implies p q) = liftA2 (||) (eval given (Not p)) (eval given q)
-eval' given (Not p) = fmap not (eval given p)
+evalOnTT' :: [Exp] -> Exp -> Maybe Bool
+evalOnTT' _ (Prop p) = Nothing
+evalOnTT' given (And p q) = liftA2 (&&) (evalOnTT given p) (evalOnTT given q)
+evalOnTT' given (Or p q) = liftA2 (||) (evalOnTT given p) (evalOnTT given q)
+evalOnTT' given (Implies p q) = liftA2 (||) (evalOnTT given (Not p)) (evalOnTT given q)
+evalOnTT' given (Not p) = fmap not (evalOnTT given p)
 
 taut :: Exp -> Bool
-taut sent = unMaybe (foldr (liftA2 (&&)) (Just True) (map (\entry -> eval entry sent) (truthTable (atoms sent))))
+taut sent = truthy (foldr (liftA2 (&&)) (Just True) (map (\entry -> evalOnTT entry sent) (truthTable (atoms sent))))
 
-unMaybe :: Maybe Bool -> Bool
-unMaybe (Just True) =  True
-unMaybe (Just False) = False
-unMaybe Nothing = False
+provableGiven :: [Exp] -> Exp -> Bool
+provableGiven axioms sent = taut (Implies (conjunct axioms) sent)
+
+conjunct :: [Exp] -> Exp
+conjunct [e] = e
+conjunct (e:es) = And e (conjunct es)
+conjunct [] = undefined
+
+truthy :: Maybe Bool -> Bool
+truthy (Just True) =  True
+truthy (Just False) = False
+truthy Nothing = False
 
 truthTable :: [Char] -> [[Exp]]
 truthTable = foldr (\x y -> (map ((Prop x):) y) ++ (map ((Not (Prop x)):) y)) [[]]
