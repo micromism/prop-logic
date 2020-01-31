@@ -18,7 +18,7 @@ rExp e = case (parse pExp "" (rmSpace e)) of
            Right exp -> exp
 
 rmSpace :: String -> String
-rmSpace = filter (/=" ")
+rmSpace = filter (/=' ')
 
 --proofRes' :: Maybe Bool -> String
 --pproofRes' (Just True) = "Provable True"
