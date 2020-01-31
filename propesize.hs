@@ -13,9 +13,12 @@ main = do
     putStrLn (proofRes assumptions toCheck)
 
 rExp :: String -> Exp
-rExp e = case (parse pExp "" e) of
+rExp e = case (parse pExp "" (rmSpace e)) of
            Left err -> error (show err)
            Right exp -> exp
+
+rmSpace :: String -> String
+rmSpace = filter (/=" ")
 
 --proofRes' :: Maybe Bool -> String
 --pproofRes' (Just True) = "Provable True"
