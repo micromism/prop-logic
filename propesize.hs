@@ -26,7 +26,8 @@ rmSpace = filter (/=' ')
 --pproofRes' Nothing = "Indeterminate under given assumptions"
 
 proofRes :: [String] -> String -> String
-proofRes givenS proveS = proofRes' (provableGiven (map rExp givenS) (rExp proveS))
+proofRes givenS proveS = proofRes' (provableGiven' (map rExp givenS) (rExp proveS))
                     where
-                        proofRes' True = "Provable true."
-                        proofRes' False = "Not provable."
+                        proofRes' (Just True) = "Provable true."
+                        proofRes' (Just False) = "Provable false."
+                        proofRes' Nothing = "Indeterminate under given assumptions."
