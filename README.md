@@ -1,7 +1,7 @@
 # prop-logic
 A module representing propositional logic. Implemented in Haskell.
 
-To use: run the appropriate executable and follow the prompts.
+To use: download and run the appropriate executable and follow the prompts.
 
 Be nice with the syntax.  
 Wrap every ambiguity in parentheses. Actually, in the below example, there isn't any ambiguity in the second `-` in 
