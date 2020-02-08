@@ -11,21 +11,21 @@ data Exp
     | Not Exp
     deriving (Show, Eq)
 
-evalOnTT :: [Exp] -> Exp -> Maybe Bool
+evalOnTT :: [Exp] -> Exp -> Bool
 evalOnTT given try
-    |elem try given = Just True
-    |elem (Not try) given = Just False
+    |elem try given = True
+    |elem (Not try) given = False
     |otherwise = evalOnTT' given try
 
-evalOnTT' :: [Exp] -> Exp -> Maybe Bool
-evalOnTT' _ (Prop p) = Nothing
-evalOnTT' given (And p q) = liftA2 (&&) (evalOnTT given p) (evalOnTT given q)
-evalOnTT' given (Or p q) = liftA2 (||) (evalOnTT given p) (evalOnTT given q)
-evalOnTT' given (Implies p q) = liftA2 (||) (evalOnTT given (Not p)) (evalOnTT given q)
-evalOnTT' given (Not p) = fmap not (evalOnTT given p)
+evalOnTT' :: [Exp] -> Exp -> Bool
+evalOnTT' _ (Prop p) = undefined
+evalOnTT' given (And p q) = (&&) (evalOnTT given p) (evalOnTT given q)
+evalOnTT' given (Or p q) = (||) (evalOnTT given p) (evalOnTT given q)
+evalOnTT' given (Implies p q) = (||) (evalOnTT given (Not p)) (evalOnTT given q)
+evalOnTT' given (Not p) = not (evalOnTT given p)
 
 taut :: Exp -> Bool
-taut sent = truthy (foldr (liftA2 (&&)) (Just True) (map (\entry -> evalOnTT entry sent) (truthTable (atoms sent))))
+taut sent = foldr (&&) True (map (\entry -> evalOnTT entry sent) (truthTable (atoms sent)))
 
 taut' :: Exp -> Maybe Bool
 taut' sent = combine (taut sent, taut (Not sent))
